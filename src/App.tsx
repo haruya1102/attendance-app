@@ -1,32 +1,17 @@
-// App.tsx
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import LoginPage from './pages/LoginPage/LoginPage'; // ログインページをインポート
-import SignUpPage from './pages/SignUpPage/SignUpPage'; // 新規アカウント作成ページをインポート
-import Dashboard from './pages/Dashboard/Dashboard';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from './firebase/config';
+import React, { Suspense } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Registration from './components/Registration/Registration';
+const Home = React.lazy(() => import('./components/Home/Home'));
 
 const App = () => {
-  const [user, loading, error] = useAuthState(auth);
-
-  if (loading) {
-    return <div>Loading...</div>; // 認証状態のロード中に表示するコンテンツ
-  }
-
-  if (error) {
-    return <div>Error: {error.message}</div>; // エラーがあった場合に表示
-  }
-
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={user ? <Navigate to="/" /> : <LoginPage />} />
-        <Route path="/sign-up" element={user ? <Navigate to="/" /> : <SignUpPage />} /> {/* 新規アカウント作成ページ */}
-        <Route path="/" element={user ? <Dashboard /> : <Navigate to="/login" />} />
-        {/* 以下、必要に応じて他のルートを追加 */}
-        <Route path="*" element={<Navigate to={user ? "/" : "/login"} />} /> {/* 未定義のパスへのアクセスを処理 */}
-      </Routes>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path='/registration' element={<Registration />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 };
