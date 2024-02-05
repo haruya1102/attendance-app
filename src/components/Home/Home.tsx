@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import RecordList from './RecordList';
+import Button from '../Button';
 
 interface Timestamp {
   type: '出勤' | '退勤';
@@ -18,15 +19,16 @@ interface User {
 const Home: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<string>('');
+  const [currentDateTime, setCurrentDateTime] = useState<string>('');
+  const navigate = useNavigate();
 
-  // 'fetchUsers' 関数を独立させ、useEffect内および他の場所から呼び出せるようにする
   const fetchUsers = async () => {
     const querySnapshot = await getDocs(collection(db, "users"));
     const usersArray: User[] = querySnapshot.docs.map(doc => {
       const data = doc.data();
       const timestamps = data.timestamps ? data.timestamps.map((t: any) => ({
         type: t.type,
-        timestamp: t.timestamp.toDate() // Firestore TimestampをDateに変換
+        timestamp: t.timestamp.toDate()
       })) : [];
       return {
         id: doc.id,
@@ -37,8 +39,19 @@ const Home: React.FC = () => {
     setUsers(usersArray);
   };
 
+  const updateCurrentDateTime = () => {
+    const now = new Date();
+    const formattedDateTime = now.toLocaleString();
+    setCurrentDateTime(formattedDateTime);
+  };
+
   useEffect(() => {
     fetchUsers();
+    updateCurrentDateTime();
+
+    const intervalId = setInterval(updateCurrentDateTime, 1000); // 1秒ごとに更新
+
+    return () => clearInterval(intervalId);
   }, []);
 
     const handleAttendance = async (type: '定時出勤' | '定時退勤' | '早出出勤' | '残業退勤' | '休憩開始' | '休憩終了') => {
@@ -65,25 +78,48 @@ const Home: React.FC = () => {
     };
 
   return (
-    <div>
-        <h1>社員の出勤・退勤記録</h1>
-        <select value={selectedUser} onChange={(e) => setSelectedUser(e.target.value)}>
-        <option value="">社員を選択してください</option>
-        {users.map(user => (
-            <option key={user.id} value={user.id}>{user.fullName}</option>
-        ))}
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-50 p-4">
+      <button
+        onClick={() => navigate('/registration')}
+        className="mb-4 bg-blue-500 text-white font-medium text-lg p-3 rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out w-full max-w-xs"
+      >
+        新規登録
+      </button>
+      <div className="text-center mb-8">
+        <p className="text-2xl font-semibold mb-2">現在時刻</p>
+        <p className="text-4xl font-bold text-gray-800">{currentDateTime}</p>
+      </div>
+      <div className="w-full max-w-md mb-4">
+        <select
+          value={selectedUser}
+          onChange={(e) => setSelectedUser(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="">社員を選択してください</option>
+          {users.map((user) => (
+            <option key={user.id} value={user.id}>
+              {user.fullName}
+            </option>
+          ))}
         </select>
-        <button onClick={() => handleAttendance('定時出勤')}>出勤</button>
-        <button onClick={() => handleAttendance('定時退勤')}>退勤</button>
-        <button onClick={() => handleAttendance('早出出勤')}>早出出勤</button>
-        <button onClick={() => handleAttendance('残業退勤')}>残業退勤</button>
-        <button onClick={() => handleAttendance('休憩開始')}>休憩開始</button>
-        <button onClick={() => handleAttendance('休憩終了')}>休憩終了</button>
-        {selectedUser && users.find(user => user.id === selectedUser) && (
-        <RecordList timestamps={users.find(user => user.id === selectedUser)!.timestamps} />
-        )}
-        <Link to="/registration">新規登録</Link>
-        <Link to="/users">ユーザー一覧を見る</Link>
+      </div>
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <Button onClick={() => handleAttendance('定時出勤')} color="blue">定時出勤</Button>
+        <Button onClick={() => handleAttendance('定時退勤')} color="red">定時退勤</Button>
+        <Button onClick={() => handleAttendance('早出出勤')} color="green">早出出勤</Button>
+        <Button onClick={() => handleAttendance('残業退勤')} color="yellow">残業退勤</Button>
+        <Button onClick={() => handleAttendance('休憩開始')} color="purple">休憩開始</Button>
+        <Button onClick={() => handleAttendance('休憩終了')} color="pink">休憩終了</Button>
+      </div>
+      {selectedUser && (
+        <RecordList timestamps={users.find((user) => user.id === selectedUser)?.timestamps || []} />
+      )}
+      <button
+        onClick={() => navigate('/users')}
+        className="mt-4 bg-gray-500 text-white font-medium text-lg p-3 rounded-lg hover:bg-gray-600 transition duration-300 ease-in-out w-full max-w-xs"
+      >
+        社員一覧
+      </button>
     </div>
   );
 };
