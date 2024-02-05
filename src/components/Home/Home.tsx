@@ -41,28 +41,28 @@ const Home: React.FC = () => {
     fetchUsers();
   }, []);
 
-  const handleAttendance = async (type: '出勤' | '退勤') => {
+    const handleAttendance = async (type: '定時出勤' | '定時退勤' | '早出出勤' | '残業退勤' | '休憩開始' | '休憩終了') => {
     if (!selectedUser) {
-      alert("ユーザーを選択してください。");
-      return;
+        alert("ユーザーを選択してください。");
+        return;
     }
 
     const userDocRef = doc(db, "users", selectedUser);
     try {
-      const selectedUsr = users.find(user => user.id === selectedUser);
-      const newTimestamp = { type, timestamp: new Date() };
-      
-      await updateDoc(userDocRef, {
+        const selectedUsr = users.find(user => user.id === selectedUser);
+        const newTimestamp = { type, timestamp: new Date() };
+        
+        await updateDoc(userDocRef, {
         timestamps: selectedUsr?.timestamps ? [...selectedUsr.timestamps, newTimestamp] : [newTimestamp],
-      });
+        });
 
-      alert(`${type}記録が完了しました`);
-      fetchUsers(); // ユーザーデータを再取得してUIを更新
+        await fetchUsers();
+
     } catch (error) {
-      alert("記録に失敗しました。");
-      console.error("記録エラー: ", error);
+        alert("記録に失敗しました。");
+        console.error("記録エラー: ", error);
     }
-  };
+    };
 
   return (
     <div>
@@ -73,12 +73,17 @@ const Home: React.FC = () => {
             <option key={user.id} value={user.id}>{user.fullName}</option>
         ))}
         </select>
-        <button onClick={() => handleAttendance('出勤')}>出勤</button>
-        <button onClick={() => handleAttendance('退勤')}>退勤</button>
+        <button onClick={() => handleAttendance('定時出勤')}>出勤</button>
+        <button onClick={() => handleAttendance('定時退勤')}>退勤</button>
+        <button onClick={() => handleAttendance('早出出勤')}>早出出勤</button>
+        <button onClick={() => handleAttendance('残業退勤')}>残業退勤</button>
+        <button onClick={() => handleAttendance('休憩開始')}>休憩開始</button>
+        <button onClick={() => handleAttendance('休憩終了')}>休憩終了</button>
         {selectedUser && users.find(user => user.id === selectedUser) && (
         <RecordList timestamps={users.find(user => user.id === selectedUser)!.timestamps} />
         )}
         <Link to="/registration">新規登録</Link>
+        <Link to="/users">ユーザー一覧を見る</Link>
     </div>
   );
 };
