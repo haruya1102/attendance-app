@@ -1,6 +1,8 @@
+// App.tsx
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import LoginPage from './pages/LoginPage/LoginPage';
+import LoginPage from './pages/LoginPage/LoginPage'; // ログインページをインポート
+import SignUpPage from './pages/SignUpPage/SignUpPage'; // 新規アカウント作成ページをインポート
 import Dashboard from './pages/Dashboard/Dashboard';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from './firebase/config';
@@ -20,6 +22,7 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={user ? <Navigate to="/" /> : <LoginPage />} />
+        <Route path="/sign-up" element={user ? <Navigate to="/" /> : <SignUpPage />} /> {/* 新規アカウント作成ページ */}
         <Route path="/" element={user ? <Dashboard /> : <Navigate to="/login" />} />
         {/* 以下、必要に応じて他のルートを追加 */}
         <Route path="*" element={<Navigate to={user ? "/" : "/login"} />} /> {/* 未定義のパスへのアクセスを処理 */}

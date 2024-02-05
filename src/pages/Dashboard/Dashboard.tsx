@@ -1,11 +1,11 @@
 import React from 'react';
-import { signOut } from '../../firebase/auth';
+import { signOutUser } from '../../firebase/auth';
 import TimeRecords from '../../components/TimeRecord/TimeRecords';
 
 const Dashboard = () => {
   const handleLogout = async () => {
     try {
-      await signOut();
+      await signOutUser();
       console.log('ログアウト成功');
       // ログアウト成功後のリダイレクト処理
     } catch (error) {
