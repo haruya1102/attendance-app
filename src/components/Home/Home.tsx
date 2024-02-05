@@ -3,7 +3,6 @@ import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import { useNavigate } from 'react-router-dom';
 import RecordList from './RecordList';
-import Button from '../Button';
 
 interface Timestamp {
   type: '出勤' | '退勤';
@@ -104,12 +103,42 @@ const Home: React.FC = () => {
         </select>
       </div>
       <div className="grid grid-cols-2 gap-4 mb-4">
-        <Button onClick={() => handleAttendance('定時出勤')} color="blue">定時出勤</Button>
-        <Button onClick={() => handleAttendance('定時退勤')} color="red">定時退勤</Button>
-        <Button onClick={() => handleAttendance('早出出勤')} color="green">早出出勤</Button>
-        <Button onClick={() => handleAttendance('残業退勤')} color="yellow">残業退勤</Button>
-        <Button onClick={() => handleAttendance('休憩開始')} color="purple">休憩開始</Button>
-        <Button onClick={() => handleAttendance('休憩終了')} color="pink">休憩終了</Button>
+        <button
+            onClick={() => handleAttendance('定時出勤')}
+            className="bg-blue-500 text-white p-4 rounded-lg text-lg hover:bg-blue-600 transition duration-300 ease-in-out"
+        >
+        定時出勤
+        </button>
+        <button
+            onClick={() => handleAttendance('定時退勤')}
+            className="bg-red-500 text-white p-4 rounded-lg text-lg hover:bg-red-600 transition duration-300 ease-in-out"
+        >
+        定時退勤
+        </button>
+        <button
+            onClick={() => handleAttendance('早出出勤')}
+            className="bg-green-500 text-white p-4 rounded-lg text-lg hover:bg-green-600 transition duration-300 ease-in-out"
+        >
+        早出出勤
+        </button>
+        <button
+            onClick={() => handleAttendance('残業退勤')}
+            className="bg-yellow-500 text-white p-4 rounded-lg text-lg hover:bg-yellow-600 transition duration-300 ease-in-out"
+        >
+        残業退勤
+        </button>
+        <button
+            onClick={() => handleAttendance('休憩開始')}
+            className="bg-purple-500 text-white p-4 rounded-lg text-lg hover:bg-purple-600 transition duration-300 ease-in-out"
+        >
+        休憩開始
+        </button>
+        <button
+            onClick={() => handleAttendance('休憩終了')}
+            className="bg-pink-500 text-white p-4 rounded-lg text-lg hover:bg-pink-600 transition duration-300 ease-in-out"
+        >
+        休憩終了
+        </button>
       </div>
       {selectedUser && (
         <RecordList timestamps={users.find((user) => user.id === selectedUser)?.timestamps || []} />
