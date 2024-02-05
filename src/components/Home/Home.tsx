@@ -77,7 +77,7 @@ const Home: React.FC = () => {
     };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-50 p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
       <button
         onClick={() => navigate('/registration')}
         className="mb-4 bg-blue-500 text-white font-medium text-lg p-3 rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out w-full max-w-xs"
